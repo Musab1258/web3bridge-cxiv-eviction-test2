@@ -1,66 +1,46 @@
-## Foundry
+# ARES Protocol
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+ARES is an enterprise-grade, decentralized governance protocol designed to manage high-value treasuries with a focus on defense-in-depth and cryptographic security. 
 
-Foundry consists of:
+## Security Features
 
-- **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
-- **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
-- **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
-- **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+- **48-Hour Timelock**: Prevents "flash" governance attacks.
+- **EIP-712 Signatures**: Secure, off-chain authorization with replay protection.
+- **Merkle Rewards**: Gas-efficient token distribution for thousands of users.
+- **Single Withdrawal Limit**: Hard caps on single-transaction outflows.
 
-## Documentation
+## How to Test
 
-https://book.getfoundry.sh/
+### Prerequisites
 
-## Usage
+*   Foundry installed.
 
-### Build
+## Installation
 
-```shell
-$ forge build
+```bash
+# Install OpenZeppelin dependencies
+forge install OpenZeppelin/openzeppelin-contracts
 ```
 
-### Test
+## Build & Test
 
-```shell
-$ forge test
+```bash
+# Compile all contracts
+forge build
+
+# Run the 8 Mandatory Security Exploit Tests
+forge test --match-contract AresExploitsTest -vvvv
 ```
 
-### Format
+### Security Test Suite
 
-```shell
-$ forge fmt
-```
+The project includes 8 comprehensive negative test cases proving the protocol's resilience:
 
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+*   **Premature Execution:** Reverts if called before 48-hour delay.
+*   **Unauthorized Cancel:** Blocks non-governor cancellation attempts.
+*   **Invalid Signature:** Rejects signatures from unauthorized keys.
+*   **Signature Replay:** Prevents reuse of valid signatures via nonces.
+*   **Proposal Replay:** Ensures identical payloads generate unique IDs.
+*   **Front-running:** Protects against state changes during race conditions.
+*   **Double Claim:** Blocks multiple reward withdrawals in a single round.
+*   **Reentrancy:** Neutralizes recursive calls during fund transfers.
